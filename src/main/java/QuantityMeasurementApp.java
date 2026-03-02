@@ -1,9 +1,17 @@
 public class QuantityMeasurementApp {
 
     /**
-     * Demonstrates addition of two lengths, result in unit of first operand.
-     * @param first  first QuantityLength
-     * @param second second QuantityLength
+     * UC7 - demonstrates addition with explicit target unit using instances.
+     */
+    public static void demonstrateLengthAddition(QuantityLength first,
+                                                 QuantityLength second,
+                                                 LengthUnit targetUnit) {
+        QuantityLength result = QuantityLength.add(first, second, targetUnit);
+        System.out.printf("add(%s, %s, %s) = %s%n", first, second, targetUnit, result);
+    }
+
+    /**
+     * UC6 - demonstrates addition with result in first operand unit.
      */
     public static void demonstrateLengthAddition(QuantityLength first, QuantityLength second) {
         QuantityLength result = first.add(second);
@@ -11,32 +19,19 @@ public class QuantityMeasurementApp {
     }
 
     /**
-     * Demonstrates addition using raw values and units.
-     * @param v1 first value
-     * @param u1 first unit
-     * @param v2 second value
-     * @param u2 second unit
+     * UC6 - raw value overload.
      */
-    public static void demonstrateLengthAddition(double v1, LengthUnit u1, double v2, LengthUnit u2) {
-        QuantityLength first  = new QuantityLength(v1, u1);
-        QuantityLength second = new QuantityLength(v2, u2);
-        demonstrateLengthAddition(first, second);
+    public static void demonstrateLengthAddition(double v1, LengthUnit u1,
+                                                 double v2, LengthUnit u2) {
+        demonstrateLengthAddition(new QuantityLength(v1, u1), new QuantityLength(v2, u2));
     }
 
     /**
-     * Demonstrates conversion using raw value and units.
+     * Demonstrates conversion using raw values.
      */
-    public static void demonstrateLengthConversion(double value, LengthUnit fromUnit, LengthUnit toUnit) {
-        double result = QuantityLength.convert(value, fromUnit, toUnit);
-        System.out.printf("convert(%.4f %s → %s) = %.6f%n", value, fromUnit, toUnit, result);
-    }
-
-    /**
-     * Demonstrates conversion using existing QuantityLength object.
-     */
-    public static void demonstrateLengthConversion(QuantityLength length, LengthUnit toUnit) {
-        QuantityLength result = length.convertTo(toUnit);
-        System.out.printf("convert(%s → %s) = %s%n", length, toUnit, result);
+    public static void demonstrateLengthConversion(double value, LengthUnit from, LengthUnit to) {
+        System.out.printf("convert(%.4f %s → %s) = %.6f%n",
+                value, from, to, QuantityLength.convert(value, from, to));
     }
 
     /**
@@ -46,29 +41,45 @@ public class QuantityMeasurementApp {
         System.out.printf("equals(%s, %s) = %b%n", a, b, a.equals(b));
     }
 
-    /**
-     * Demonstrates comparison using raw values and units.
-     */
-    public static void demonstrateLengthComparison(double v1, LengthUnit u1, double v2, LengthUnit u2) {
-        demonstrateLengthEquality(new QuantityLength(v1, u1), new QuantityLength(v2, u2));
-    }
-
     public static void main(String[] args) {
 
-        System.out.println("=== Addition Demo ===\n");
+        System.out.println("=== UC7: Addition with Explicit Target Unit ===\n");
 
-        // same unit addition
-        demonstrateLengthAddition(1.0, LengthUnit.FEET,        2.0, LengthUnit.FEET);
+        QuantityLength oneFoot    = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength twelveInch = new QuantityLength(12.0, LengthUnit.INCHES);
 
-        // cross unit addition - result in first operand unit
-        demonstrateLengthAddition(1.0, LengthUnit.FEET,       12.0, LengthUnit.INCHES);
-        demonstrateLengthAddition(12.0, LengthUnit.INCHES,     1.0, LengthUnit.FEET);
-        demonstrateLengthAddition(1.0, LengthUnit.YARDS,       3.0, LengthUnit.FEET);
-        demonstrateLengthAddition(36.0, LengthUnit.INCHES,     1.0, LengthUnit.YARDS);
-        demonstrateLengthAddition(2.54, LengthUnit.CENTIMETERS, 1.0, LengthUnit.INCHES);
+        // same addition, three different target units
+        demonstrateLengthAddition(oneFoot, twelveInch, LengthUnit.FEET);
+        demonstrateLengthAddition(oneFoot, twelveInch, LengthUnit.INCHES);
+        demonstrateLengthAddition(oneFoot, twelveInch, LengthUnit.YARDS);
+
+        System.out.println();
+
+        // yards and feet → result in various units
+        QuantityLength oneYard   = new QuantityLength(1.0, LengthUnit.YARDS);
+        QuantityLength threeFeet = new QuantityLength(3.0, LengthUnit.FEET);
+        demonstrateLengthAddition(oneYard, threeFeet, LengthUnit.YARDS);
+        demonstrateLengthAddition(oneYard, threeFeet, LengthUnit.FEET);
+        demonstrateLengthAddition(oneYard, threeFeet, LengthUnit.INCHES);
+
+        System.out.println();
+
+        // centimeters
+        QuantityLength twoCm  = new QuantityLength(2.54, LengthUnit.CENTIMETERS);
+        QuantityLength oneInch = new QuantityLength(1.0, LengthUnit.INCHES);
+        demonstrateLengthAddition(twoCm, oneInch, LengthUnit.CENTIMETERS);
+
+        System.out.println();
 
         // zero and negative
-        demonstrateLengthAddition(5.0, LengthUnit.FEET,        0.0, LengthUnit.INCHES);
-        demonstrateLengthAddition(5.0, LengthUnit.FEET,       -2.0, LengthUnit.FEET);
+        demonstrateLengthAddition(
+                new QuantityLength(5.0, LengthUnit.FEET),
+                new QuantityLength(0.0, LengthUnit.INCHES),
+                LengthUnit.YARDS);
+
+        demonstrateLengthAddition(
+                new QuantityLength(5.0, LengthUnit.FEET),
+                new QuantityLength(-2.0, LengthUnit.FEET),
+                LengthUnit.INCHES);
     }
 }
