@@ -1,30 +1,64 @@
 public class QuantityMeasurementApp {
 
+    /**
+     * Overload 1 - demonstrate conversion using raw value and units.
+     * @param value    numeric value
+     * @param fromUnit source unit
+     * @param toUnit   target unit
+     */
+    public static void demonstrateLengthConversion(double value, LengthUnit fromUnit, LengthUnit toUnit) {
+        double result = QuantityLength.convert(value, fromUnit, toUnit);
+        System.out.printf("convert(%.4f %s → %s) = %.6f%n", value, fromUnit, toUnit, result);
+    }
+
+    /**
+     * Overload 2 - demonstrate conversion using existing QuantityLength object.
+     * @param length   existing QuantityLength instance
+     * @param toUnit   target unit
+     */
+    public static void demonstrateLengthConversion(QuantityLength length, LengthUnit toUnit) {
+        QuantityLength result = length.convertTo(toUnit);
+        System.out.printf("convert(%s → %s) = %s%n", length, toUnit, result);
+    }
+
+    /**
+     * Demonstrates equality between two lengths.
+     */
+    public static void demonstrateLengthEquality(QuantityLength a, QuantityLength b) {
+        System.out.printf("equals(%s, %s) = %b%n", a, b, a.equals(b));
+    }
+
+    /**
+     * Demonstrates comparison using raw values and units.
+     */
+    public static void demonstrateLengthComparison(double v1, LengthUnit u1, double v2, LengthUnit u2) {
+        QuantityLength a = new QuantityLength(v1, u1);
+        QuantityLength b = new QuantityLength(v2, u2);
+        demonstrateLengthEquality(a, b);
+    }
+
     public static void main(String[] args) {
 
-        // yards to yards
-        QuantityLength yard1 = new QuantityLength(1.0, LengthUnit.YARDS);
-        QuantityLength yard2 = new QuantityLength(1.0, LengthUnit.YARDS);
-        System.out.println("1.0 yard == 1.0 yard      : " + yard1.equals(yard2));
+        System.out.println("=== Conversion Demo ===\n");
 
-        // yards to feet
-        QuantityLength oneYard   = new QuantityLength(1.0, LengthUnit.YARDS);
-        QuantityLength threeFeet = new QuantityLength(3.0, LengthUnit.FEET);
-        System.out.println("1.0 yard == 3.0 feet      : " + oneYard.equals(threeFeet));
+        // overload 1 - raw value conversion
+        demonstrateLengthConversion(1.0, LengthUnit.FEET,        LengthUnit.INCHES);
+        demonstrateLengthConversion(3.0, LengthUnit.YARDS,        LengthUnit.FEET);
+        demonstrateLengthConversion(36.0, LengthUnit.INCHES,      LengthUnit.YARDS);
+        demonstrateLengthConversion(1.0, LengthUnit.CENTIMETERS,  LengthUnit.INCHES);
+        demonstrateLengthConversion(0.0, LengthUnit.FEET,         LengthUnit.INCHES);
 
-        // yards to inches
-        QuantityLength oneYard2      = new QuantityLength(1.0, LengthUnit.YARDS);
-        QuantityLength thirtySixInch = new QuantityLength(36.0, LengthUnit.INCHES);
-        System.out.println("1.0 yard == 36.0 inches   : " + oneYard2.equals(thirtySixInch));
+        System.out.println();
 
-        // centimeters to centimeters
-        QuantityLength cm1 = new QuantityLength(2.0, LengthUnit.CENTIMETERS);
-        QuantityLength cm2 = new QuantityLength(2.0, LengthUnit.CENTIMETERS);
-        System.out.println("2.0 cm == 2.0 cm          : " + cm1.equals(cm2));
+        // overload 2 - instance based conversion
+        QuantityLength lengthInYards = new QuantityLength(1.0, LengthUnit.YARDS);
+        demonstrateLengthConversion(lengthInYards, LengthUnit.INCHES);
+        demonstrateLengthConversion(lengthInYards, LengthUnit.FEET);
 
-        // centimeters to inches
-        QuantityLength oneCm        = new QuantityLength(1.0, LengthUnit.CENTIMETERS);
-        QuantityLength pointThreeIn = new QuantityLength(0.393701, LengthUnit.INCHES);
-        System.out.println("1.0 cm == 0.393701 inches : " + oneCm.equals(pointThreeIn));
+        System.out.println("\n=== Equality Demo ===\n");
+
+        demonstrateLengthComparison(1.0, LengthUnit.FEET,   12.0, LengthUnit.INCHES);
+        demonstrateLengthComparison(1.0, LengthUnit.YARDS,   3.0, LengthUnit.FEET);
+        demonstrateLengthComparison(1.0, LengthUnit.YARDS,  36.0, LengthUnit.INCHES);
     }
 }
