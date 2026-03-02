@@ -3,150 +3,160 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class QuantityMeasurementAppTest {
 
-    // ── Feet Test Cases ──────────────────────────────────────────────────
+    // ── Same Unit Equality ───────────────────────────────────────────────
 
     @Test
-    void testFeetEquality_SameValue() {
+    void testEquality_FeetToFeet_SameValue() {
         // same feet value should be equal
-        Feet feet1 = new Feet(1.0);
-        Feet feet2 = new Feet(1.0);
+        QuantityLength feet1 = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength feet2 = new QuantityLength(1.0, LengthUnit.FEET);
         assertEquals(feet1, feet2);
     }
 
     @Test
-    void testFeetEquality_DifferentValue() {
-        // different feet value should not be equal
-        Feet feet1 = new Feet(1.0);
-        Feet feet2 = new Feet(2.0);
+    void testEquality_InchToInch_SameValue() {
+        // same inch value should be equal
+        QuantityLength inch1 = new QuantityLength(1.0, LengthUnit.INCHES);
+        QuantityLength inch2 = new QuantityLength(1.0, LengthUnit.INCHES);
+        assertEquals(inch1, inch2);
+    }
+
+    @Test
+    void testEquality_FeetToFeet_DifferentValue() {
+        // different feet values should not be equal
+        QuantityLength feet1 = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength feet2 = new QuantityLength(2.0, LengthUnit.FEET);
         assertNotEquals(feet1, feet2);
     }
 
     @Test
-    void testFeetEquality_NullComparison() {
-        // feet compared to null should not be equal
-        Feet feet1 = new Feet(1.0);
-        assertNotEquals(feet1, null);
+    void testEquality_InchToInch_DifferentValue() {
+        // different inch values should not be equal
+        QuantityLength inch1 = new QuantityLength(1.0, LengthUnit.INCHES);
+        QuantityLength inch2 = new QuantityLength(2.0, LengthUnit.INCHES);
+        assertNotEquals(inch1, inch2);
+    }
+
+    // ── Cross Unit Equality ──────────────────────────────────────────────
+
+    @Test
+    void testEquality_FeetToInch_EquivalentValue() {
+        // 1 feet == 12 inches
+        QuantityLength oneFoot    = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength twelveInch = new QuantityLength(12.0, LengthUnit.INCHES);
+        assertEquals(oneFoot, twelveInch);
     }
 
     @Test
-    void testFeetEquality_NonNumericInput() {
-        // feet compared to a string should not be equal
-        Feet feet1 = new Feet(1.0);
-        assertNotEquals(feet1, "1.0");
+    void testEquality_InchToFeet_EquivalentValue() {
+        // 12 inches == 1 feet (symmetry check)
+        QuantityLength twelveInch = new QuantityLength(12.0, LengthUnit.INCHES);
+        QuantityLength oneFoot    = new QuantityLength(1.0, LengthUnit.FEET);
+        assertEquals(twelveInch, oneFoot);
     }
 
     @Test
-    void testFeetEquality_SameReference() {
-        // same reference should always be equal
-        Feet feet1 = new Feet(1.0);
+    void testEquality_FeetToInch_NotEquivalent() {
+        // 1 feet != 1 inch
+        QuantityLength oneFoot = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength oneInch = new QuantityLength(1.0, LengthUnit.INCHES);
+        assertNotEquals(oneFoot, oneInch);
+    }
+
+    // ── Equality Contract ────────────────────────────────────────────────
+
+    @Test
+    void testEquality_SameReference() {
+        // reflexive - object must equal itself
+        QuantityLength feet1 = new QuantityLength(1.0, LengthUnit.FEET);
         assertEquals(feet1, feet1);
     }
 
     @Test
-    void testFeetEquality_ZeroValue() {
-        // zero feet should be equal
-        Feet feet1 = new Feet(0.0);
-        Feet feet2 = new Feet(0.0);
+    void testEquality_Symmetric() {
+        // if a==b then b==a
+        QuantityLength feet1 = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength feet2 = new QuantityLength(1.0, LengthUnit.FEET);
+        assertEquals(feet1, feet2);
+        assertEquals(feet2, feet1);
+    }
+
+    @Test
+    void testEquality_Transitive() {
+        // if a==b and b==c then a==c
+        QuantityLength feet1     = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength feet2     = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength feet3     = new QuantityLength(1.0, LengthUnit.FEET);
+        assertEquals(feet1, feet2);
+        assertEquals(feet2, feet3);
+        assertEquals(feet1, feet3);
+    }
+
+    // ── Null and Type Safety ─────────────────────────────────────────────
+
+    @Test
+    void testEquality_NullComparison() {
+        // object compared to null should not be equal
+        QuantityLength feet1 = new QuantityLength(1.0, LengthUnit.FEET);
+        assertNotEquals(feet1, null);
+    }
+
+    @Test
+    void testEquality_NonQuantityType() {
+        // object compared to string should not be equal
+        QuantityLength feet1 = new QuantityLength(1.0, LengthUnit.FEET);
+        assertNotEquals(feet1, "1.0");
+    }
+
+    @Test
+    void testEquality_NullUnit() {
+        // null unit should throw IllegalArgumentException
+        assertThrows(IllegalArgumentException.class, () -> {
+            new QuantityLength(1.0, null);
+        });
+    }
+
+    // ── Edge Cases ───────────────────────────────────────────────────────
+
+    @Test
+    void testEquality_ZeroFeet() {
+        // zero feet should equal zero feet
+        QuantityLength feet1 = new QuantityLength(0.0, LengthUnit.FEET);
+        QuantityLength feet2 = new QuantityLength(0.0, LengthUnit.FEET);
         assertEquals(feet1, feet2);
     }
 
     @Test
-    void testFeetEquality_NegativeValue() {
-        // same negative feet value should be equal
-        Feet feet1 = new Feet(-1.0);
-        Feet feet2 = new Feet(-1.0);
+    void testEquality_ZeroInches() {
+        // zero inches should equal zero inches
+        QuantityLength inch1 = new QuantityLength(0.0, LengthUnit.INCHES);
+        QuantityLength inch2 = new QuantityLength(0.0, LengthUnit.INCHES);
+        assertEquals(inch1, inch2);
+    }
+
+    @Test
+    void testEquality_ZeroFeetAndZeroInches() {
+        // 0 feet should equal 0 inches
+        QuantityLength feet1 = new QuantityLength(0.0, LengthUnit.FEET);
+        QuantityLength inch1 = new QuantityLength(0.0, LengthUnit.INCHES);
+        assertEquals(feet1, inch1);
+    }
+
+    // ── Backward Compatibility UC1 and UC2 ───────────────────────────────
+
+    @Test
+    void testBackwardCompatibility_UC1_FeetEquality() {
+        // UC1 feet equality still works
+        QuantityLength feet1 = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength feet2 = new QuantityLength(1.0, LengthUnit.FEET);
         assertEquals(feet1, feet2);
     }
 
-    // ── Inches Test Cases ────────────────────────────────────────────────
-
     @Test
-    void testInchesEquality_SameValue() {
-        // same inches value should be equal
-        Inches inch1 = new Inches(1.0);
-        Inches inch2 = new Inches(1.0);
+    void testBackwardCompatibility_UC2_InchEquality() {
+        // UC2 inch equality still works
+        QuantityLength inch1 = new QuantityLength(1.0, LengthUnit.INCHES);
+        QuantityLength inch2 = new QuantityLength(1.0, LengthUnit.INCHES);
         assertEquals(inch1, inch2);
-    }
-
-    @Test
-    void testInchesEquality_DifferentValue() {
-        // different inches value should not be equal
-        Inches inch1 = new Inches(1.0);
-        Inches inch2 = new Inches(2.0);
-        assertNotEquals(inch1, inch2);
-    }
-
-    @Test
-    void testInchesEquality_NullComparison() {
-        // inches compared to null should not be equal
-        Inches inch1 = new Inches(1.0);
-        assertNotEquals(inch1, null);
-    }
-
-    @Test
-    void testInchesEquality_NonNumericInput() {
-        // inches compared to string should not be equal
-        Inches inch1 = new Inches(1.0);
-        assertNotEquals(inch1, "1.0");
-    }
-
-    @Test
-    void testInchesEquality_SameReference() {
-        // same reference should always be equal
-        Inches inch1 = new Inches(1.0);
-        assertEquals(inch1, inch1);
-    }
-
-    @Test
-    void testInchesEquality_ZeroValue() {
-        // zero inches should be equal
-        Inches inch1 = new Inches(0.0);
-        Inches inch2 = new Inches(0.0);
-        assertEquals(inch1, inch2);
-    }
-
-    @Test
-    void testInchesEquality_NegativeValue() {
-        // same negative inches value should be equal
-        Inches inch1 = new Inches(-1.0);
-        Inches inch2 = new Inches(-1.0);
-        assertEquals(inch1, inch2);
-    }
-
-    // ── Cross Type Test Cases ────────────────────────────────────────────
-
-    @Test
-    void testFeetAndInches_AreNotEqual() {
-        // feet and inches with same value should NOT be equal
-        // they are different types
-        Feet feet1   = new Feet(1.0);
-        Inches inch1 = new Inches(1.0);
-        assertNotEquals(feet1, inch1);
-    }
-
-    // ── App Method Test Cases ────────────────────────────────────────────
-
-    @Test
-    void testCompareFeet_SameValue() {
-        // static method should return true for same feet value
-        assertTrue(QuantityMeasurementApp.compareFeet(1.0, 1.0));
-    }
-
-    @Test
-    void testCompareFeet_DifferentValue() {
-        // static method should return false for different feet value
-        assertFalse(QuantityMeasurementApp.compareFeet(1.0, 2.0));
-    }
-
-    @Test
-    void testCompareInches_SameValue() {
-        // static method should return true for same inches value
-        assertTrue(QuantityMeasurementApp.compareInches(1.0, 1.0));
-    }
-
-    @Test
-    void testCompareInches_DifferentValue() {
-        // static method should return false for different inches value
-        assertFalse(QuantityMeasurementApp.compareInches(1.0, 2.0));
     }
 }
