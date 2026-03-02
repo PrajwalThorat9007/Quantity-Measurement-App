@@ -1,10 +1,30 @@
 public class QuantityMeasurementApp {
 
     /**
-     * Overload 1 - demonstrate conversion using raw value and units.
-     * @param value    numeric value
-     * @param fromUnit source unit
-     * @param toUnit   target unit
+     * Demonstrates addition of two lengths, result in unit of first operand.
+     * @param first  first QuantityLength
+     * @param second second QuantityLength
+     */
+    public static void demonstrateLengthAddition(QuantityLength first, QuantityLength second) {
+        QuantityLength result = first.add(second);
+        System.out.printf("add(%s, %s) = %s%n", first, second, result);
+    }
+
+    /**
+     * Demonstrates addition using raw values and units.
+     * @param v1 first value
+     * @param u1 first unit
+     * @param v2 second value
+     * @param u2 second unit
+     */
+    public static void demonstrateLengthAddition(double v1, LengthUnit u1, double v2, LengthUnit u2) {
+        QuantityLength first  = new QuantityLength(v1, u1);
+        QuantityLength second = new QuantityLength(v2, u2);
+        demonstrateLengthAddition(first, second);
+    }
+
+    /**
+     * Demonstrates conversion using raw value and units.
      */
     public static void demonstrateLengthConversion(double value, LengthUnit fromUnit, LengthUnit toUnit) {
         double result = QuantityLength.convert(value, fromUnit, toUnit);
@@ -12,9 +32,7 @@ public class QuantityMeasurementApp {
     }
 
     /**
-     * Overload 2 - demonstrate conversion using existing QuantityLength object.
-     * @param length   existing QuantityLength instance
-     * @param toUnit   target unit
+     * Demonstrates conversion using existing QuantityLength object.
      */
     public static void demonstrateLengthConversion(QuantityLength length, LengthUnit toUnit) {
         QuantityLength result = length.convertTo(toUnit);
@@ -32,33 +50,25 @@ public class QuantityMeasurementApp {
      * Demonstrates comparison using raw values and units.
      */
     public static void demonstrateLengthComparison(double v1, LengthUnit u1, double v2, LengthUnit u2) {
-        QuantityLength a = new QuantityLength(v1, u1);
-        QuantityLength b = new QuantityLength(v2, u2);
-        demonstrateLengthEquality(a, b);
+        demonstrateLengthEquality(new QuantityLength(v1, u1), new QuantityLength(v2, u2));
     }
 
     public static void main(String[] args) {
 
-        System.out.println("=== Conversion Demo ===\n");
+        System.out.println("=== Addition Demo ===\n");
 
-        // overload 1 - raw value conversion
-        demonstrateLengthConversion(1.0, LengthUnit.FEET,        LengthUnit.INCHES);
-        demonstrateLengthConversion(3.0, LengthUnit.YARDS,        LengthUnit.FEET);
-        demonstrateLengthConversion(36.0, LengthUnit.INCHES,      LengthUnit.YARDS);
-        demonstrateLengthConversion(1.0, LengthUnit.CENTIMETERS,  LengthUnit.INCHES);
-        demonstrateLengthConversion(0.0, LengthUnit.FEET,         LengthUnit.INCHES);
+        // same unit addition
+        demonstrateLengthAddition(1.0, LengthUnit.FEET,        2.0, LengthUnit.FEET);
 
-        System.out.println();
+        // cross unit addition - result in first operand unit
+        demonstrateLengthAddition(1.0, LengthUnit.FEET,       12.0, LengthUnit.INCHES);
+        demonstrateLengthAddition(12.0, LengthUnit.INCHES,     1.0, LengthUnit.FEET);
+        demonstrateLengthAddition(1.0, LengthUnit.YARDS,       3.0, LengthUnit.FEET);
+        demonstrateLengthAddition(36.0, LengthUnit.INCHES,     1.0, LengthUnit.YARDS);
+        demonstrateLengthAddition(2.54, LengthUnit.CENTIMETERS, 1.0, LengthUnit.INCHES);
 
-        // overload 2 - instance based conversion
-        QuantityLength lengthInYards = new QuantityLength(1.0, LengthUnit.YARDS);
-        demonstrateLengthConversion(lengthInYards, LengthUnit.INCHES);
-        demonstrateLengthConversion(lengthInYards, LengthUnit.FEET);
-
-        System.out.println("\n=== Equality Demo ===\n");
-
-        demonstrateLengthComparison(1.0, LengthUnit.FEET,   12.0, LengthUnit.INCHES);
-        demonstrateLengthComparison(1.0, LengthUnit.YARDS,   3.0, LengthUnit.FEET);
-        demonstrateLengthComparison(1.0, LengthUnit.YARDS,  36.0, LengthUnit.INCHES);
+        // zero and negative
+        demonstrateLengthAddition(5.0, LengthUnit.FEET,        0.0, LengthUnit.INCHES);
+        demonstrateLengthAddition(5.0, LengthUnit.FEET,       -2.0, LengthUnit.FEET);
     }
 }
