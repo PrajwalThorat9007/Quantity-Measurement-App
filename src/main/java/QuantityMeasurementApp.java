@@ -1,33 +1,27 @@
-
 public class QuantityMeasurementApp {
 
-    public static class Feet {
-        private final double value;
+    // static method to compare two feet values
+    public static boolean compareFeet(double value1, double value2) {
+        Feet feet1 = new Feet(value1);
+        Feet feet2 = new Feet(value2);
+        return feet1.equals(feet2);
+    }
 
-        public Feet(double value) {
-            this.value = value;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) return true;
-            if (obj == null || getClass() != obj.getClass()) return false;
-            Feet feet = (Feet) obj;
-            return Double.compare(this.value, feet.value) == 0;
-        }
-
-        @Override
-        public int hashCode() {
-            return Double.hashCode(value);
-        }
+    // static method to compare two inches values
+    public static boolean compareInches(double value1, double value2) {
+        Inches inch1 = new Inches(value1);
+        Inches inch2 = new Inches(value2);
+        return inch1.equals(inch2);
     }
 
     public static void main(String[] args) {
-        Feet feet1 = new Feet(1.0);
-        Feet feet2 = new Feet(1.0);
-        System.out.println("1.0 ft equals 1.0 ft: " + feet1.equals(feet2)); // true
 
-        Feet feet3 = new Feet(2.0);
-        System.out.println("1.0 ft equals 2.0 ft: " + feet1.equals(feet3)); // false
+        // feet comparison
+        System.out.println("1.0 ft and 1.0 ft : " + compareFeet(1.0, 1.0));
+        System.out.println("1.0 ft and 2.0 ft : " + compareFeet(1.0, 2.0));
+
+        // inches comparison
+        System.out.println("1.0 in and 1.0 in : " + compareInches(1.0, 1.0));
+        System.out.println("1.0 in and 2.0 in : " + compareInches(1.0, 2.0));
     }
 }
