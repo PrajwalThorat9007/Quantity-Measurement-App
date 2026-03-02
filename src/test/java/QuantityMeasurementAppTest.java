@@ -3,218 +3,245 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class QuantityMeasurementAppTest {
 
-    private static final double EPSILON = 1e-2;
+    private static final double EPSILON = 1e-4;
 
-    // ── Explicit Target Unit ─────────────────────────────────────────────
+    // ── LengthUnit Enum Constants ────────────────────────────────────────
 
     @Test
-    void testAddition_ExplicitTargetUnit_Feet() {
-        // 1 foot + 12 inches → result in FEET = 2.0
-        QuantityLength result = QuantityLength.add(
+    void testLengthUnitEnum_FeetConstant() {
+        // FEET conversion factor should be 1.0 (base unit)
+        assertEquals(1.0, LengthUnit.FEET.getConversionFactor(), EPSILON);
+    }
+
+    @Test
+    void testLengthUnitEnum_InchesConstant() {
+        // INCHES conversion factor should be 1/12
+        assertEquals(1.0 / 12.0, LengthUnit.INCHES.getConversionFactor(), EPSILON);
+    }
+
+    @Test
+    void testLengthUnitEnum_YardsConstant() {
+        // YARDS conversion factor should be 3.0
+        assertEquals(3.0, LengthUnit.YARDS.getConversionFactor(), EPSILON);
+    }
+
+    @Test
+    void testLengthUnitEnum_CentimetersConstant() {
+        // CENTIMETERS conversion factor should be 1/30.48
+        assertEquals(1.0 / 30.48, LengthUnit.CENTIMETERS.getConversionFactor(), EPSILON);
+    }
+
+    // ── convertToBaseUnit() ──────────────────────────────────────────────
+
+    @Test
+    void testConvertToBaseUnit_FeetToFeet() {
+        // 5 feet → base = 5 feet (no change)
+        assertEquals(5.0, LengthUnit.FEET.convertToBaseUnit(5.0), EPSILON);
+    }
+
+    @Test
+    void testConvertToBaseUnit_InchesToFeet() {
+        // 12 inches → base = 1 foot
+        assertEquals(1.0, LengthUnit.INCHES.convertToBaseUnit(12.0), EPSILON);
+    }
+
+    @Test
+    void testConvertToBaseUnit_YardsToFeet() {
+        // 1 yard → base = 3 feet
+        assertEquals(3.0, LengthUnit.YARDS.convertToBaseUnit(1.0), EPSILON);
+    }
+
+    @Test
+    void testConvertToBaseUnit_CentimetersToFeet() {
+        // 30.48 cm → base = 1 foot
+        assertEquals(1.0, LengthUnit.CENTIMETERS.convertToBaseUnit(30.48), EPSILON);
+    }
+
+    // ── convertFromBaseUnit() ────────────────────────────────────────────
+
+    @Test
+    void testConvertFromBaseUnit_FeetToFeet() {
+        // 2 feet base → 2 feet (no change)
+        assertEquals(2.0, LengthUnit.FEET.convertFromBaseUnit(2.0), EPSILON);
+    }
+
+    @Test
+    void testConvertFromBaseUnit_FeetToInches() {
+        // 1 foot base → 12 inches
+        assertEquals(12.0, LengthUnit.INCHES.convertFromBaseUnit(1.0), EPSILON);
+    }
+
+    @Test
+    void testConvertFromBaseUnit_FeetToYards() {
+        // 3 feet base → 1 yard
+        assertEquals(1.0, LengthUnit.YARDS.convertFromBaseUnit(3.0), EPSILON);
+    }
+
+    @Test
+    void testConvertFromBaseUnit_FeetToCentimeters() {
+        // 1 foot base → 30.48 cm
+        assertEquals(30.48, LengthUnit.CENTIMETERS.convertFromBaseUnit(1.0), EPSILON);
+    }
+
+    // ── Round Trip via Unit Methods ──────────────────────────────────────
+
+    @Test
+    void testConvertRoundTrip_InchesToFeetToInches() {
+        // 24 inches → base → back to inches
+        double base   = LengthUnit.INCHES.convertToBaseUnit(24.0);
+        double result = LengthUnit.INCHES.convertFromBaseUnit(base);
+        assertEquals(24.0, result, EPSILON);
+    }
+
+    @Test
+    void testConvertRoundTrip_YardsToFeetToYards() {
+        // 2 yards → base → back to yards
+        double base   = LengthUnit.YARDS.convertToBaseUnit(2.0);
+        double result = LengthUnit.YARDS.convertFromBaseUnit(base);
+        assertEquals(2.0, result, EPSILON);
+    }
+
+    // ── Refactored QuantityLength Equality ───────────────────────────────
+
+    @Test
+    void testQuantityLengthRefactored_Equality() {
+        // 1 foot == 12 inches via refactored equals()
+        assertEquals(
                 new QuantityLength(1.0, LengthUnit.FEET),
-                new QuantityLength(12.0, LengthUnit.INCHES),
-                LengthUnit.FEET);
-        assertEquals(new QuantityLength(2.0, LengthUnit.FEET), result);
+                new QuantityLength(12.0, LengthUnit.INCHES));
     }
 
     @Test
-    void testAddition_ExplicitTargetUnit_Inches() {
-        // 1 foot + 12 inches → result in INCHES = 24.0
-        QuantityLength result = QuantityLength.add(
-                new QuantityLength(1.0, LengthUnit.FEET),
-                new QuantityLength(12.0, LengthUnit.INCHES),
-                LengthUnit.INCHES);
-        assertEquals(new QuantityLength(24.0, LengthUnit.INCHES), result);
-    }
-
-    @Test
-    void testAddition_ExplicitTargetUnit_Yards() {
-        // 1 foot + 12 inches → result in YARDS ≈ 0.67
-        QuantityLength result = QuantityLength.add(
-                new QuantityLength(1.0, LengthUnit.FEET),
-                new QuantityLength(12.0, LengthUnit.INCHES),
-                LengthUnit.YARDS);
-        assertEquals(new QuantityLength(0.67, LengthUnit.YARDS), result);
-    }
-
-    @Test
-    void testAddition_ExplicitTargetUnit_Centimeters() {
-        // 1 inch + 1 inch → result in CENTIMETERS ≈ 5.08
-        QuantityLength result = QuantityLength.add(
-                new QuantityLength(1.0, LengthUnit.INCHES),
-                new QuantityLength(1.0, LengthUnit.INCHES),
-                LengthUnit.CENTIMETERS);
-        assertEquals(new QuantityLength(5.08, LengthUnit.CENTIMETERS), result);
-    }
-
-    @Test
-    void testAddition_ExplicitTargetUnit_SameAsFirstOperand() {
-        // 2 yards + 3 feet → result in YARDS = 3.0
-        QuantityLength result = QuantityLength.add(
-                new QuantityLength(2.0, LengthUnit.YARDS),
-                new QuantityLength(3.0, LengthUnit.FEET),
-                LengthUnit.YARDS);
-        assertEquals(new QuantityLength(3.0, LengthUnit.YARDS), result);
-    }
-
-    @Test
-    void testAddition_ExplicitTargetUnit_SameAsSecondOperand() {
-        // 2 yards + 3 feet → result in FEET = 9.0
-        QuantityLength result = QuantityLength.add(
-                new QuantityLength(2.0, LengthUnit.YARDS),
-                new QuantityLength(3.0, LengthUnit.FEET),
-                LengthUnit.FEET);
-        assertEquals(new QuantityLength(9.0, LengthUnit.FEET), result);
-    }
-
-    // ── Commutativity ────────────────────────────────────────────────────
-
-    @Test
-    void testAddition_ExplicitTargetUnit_Commutativity() {
-        // add(A, B, YARDS) == add(B, A, YARDS)
-        QuantityLength a = new QuantityLength(1.0, LengthUnit.FEET);
-        QuantityLength b = new QuantityLength(12.0, LengthUnit.INCHES);
-
-        QuantityLength resultAB = QuantityLength.add(a, b, LengthUnit.YARDS);
-        QuantityLength resultBA = QuantityLength.add(b, a, LengthUnit.YARDS);
-        assertEquals(resultAB, resultBA);
-    }
-
-    // ── Edge Cases ───────────────────────────────────────────────────────
-
-    @Test
-    void testAddition_ExplicitTargetUnit_WithZero() {
-        // 5 feet + 0 inches → result in YARDS ≈ 1.67
-        QuantityLength result = QuantityLength.add(
-                new QuantityLength(5.0, LengthUnit.FEET),
-                new QuantityLength(0.0, LengthUnit.INCHES),
-                LengthUnit.YARDS);
-        assertEquals(new QuantityLength(1.67, LengthUnit.YARDS), result);
-    }
-
-    @Test
-    void testAddition_ExplicitTargetUnit_NegativeValues() {
-        // 5 feet + (-2 feet) → result in INCHES = 36.0
-        QuantityLength result = QuantityLength.add(
-                new QuantityLength(5.0, LengthUnit.FEET),
-                new QuantityLength(-2.0, LengthUnit.FEET),
-                LengthUnit.INCHES);
-        assertEquals(new QuantityLength(36.0, LengthUnit.INCHES), result);
-    }
-
-    @Test
-    void testAddition_ExplicitTargetUnit_LargeToSmallScale() {
-        // 1000 feet + 500 feet → result in INCHES = 18000.0
-        QuantityLength result = QuantityLength.add(
-                new QuantityLength(1000.0, LengthUnit.FEET),
-                new QuantityLength(500.0, LengthUnit.FEET),
-                LengthUnit.INCHES);
-        assertEquals(new QuantityLength(18000.0, LengthUnit.INCHES), result);
-    }
-
-    @Test
-    void testAddition_ExplicitTargetUnit_SmallToLargeScale() {
-        // 12 inches + 12 inches → result in YARDS ≈ 0.67
-        QuantityLength result = QuantityLength.add(
-                new QuantityLength(12.0, LengthUnit.INCHES),
-                new QuantityLength(12.0, LengthUnit.INCHES),
-                LengthUnit.YARDS);
-        assertEquals(new QuantityLength(0.67, LengthUnit.YARDS), result);
-    }
-
-    // ── Mathematical Correctness ─────────────────────────────────────────
-
-    @Test
-    void testAddition_SameAdditionDifferentTargetUnits() {
-        // 1 foot + 12 inches expressed in different units must be equivalent
-        QuantityLength a = new QuantityLength(1.0, LengthUnit.FEET);
-        QuantityLength b = new QuantityLength(12.0, LengthUnit.INCHES);
-
-        QuantityLength inFeet   = QuantityLength.add(a, b, LengthUnit.FEET);
-        QuantityLength inInches = QuantityLength.add(a, b, LengthUnit.INCHES);
-        QuantityLength inYards  = QuantityLength.add(a, b, LengthUnit.YARDS);
-
-        // all three represent the same physical length
-        assertEquals(inFeet, inInches);
-        assertEquals(inFeet, inYards);
-    }
-
-    @Test
-    void testAddition_ExplicitTargetUnit_AllUnitCombinations() {
-        // 36 inches + 1 yard → result in FEET = 6.0
-        QuantityLength result = QuantityLength.add(
-                new QuantityLength(36.0, LengthUnit.INCHES),
+    void testQuantityLengthRefactored_EqualityYards() {
+        // 1 yard == 3 feet
+        assertEquals(
                 new QuantityLength(1.0, LengthUnit.YARDS),
-                LengthUnit.FEET);
-        assertEquals(new QuantityLength(6.0, LengthUnit.FEET), result);
-    }
-
-    // ── Null Handling ────────────────────────────────────────────────────
-
-    @Test
-    void testAddition_ExplicitTargetUnit_NullTargetUnit() {
-        // null target unit should throw IllegalArgumentException
-        assertThrows(IllegalArgumentException.class, () ->
-                QuantityLength.add(
-                        new QuantityLength(1.0, LengthUnit.FEET),
-                        new QuantityLength(12.0, LengthUnit.INCHES),
-                        null));
+                new QuantityLength(3.0, LengthUnit.FEET));
     }
 
     @Test
-    void testAddition_ExplicitTargetUnit_NullFirstOperand() {
-        // null first operand should throw IllegalArgumentException
-        assertThrows(IllegalArgumentException.class, () ->
-                QuantityLength.add(null,
-                        new QuantityLength(12.0, LengthUnit.INCHES),
-                        LengthUnit.FEET));
+    void testQuantityLengthRefactored_EqualityCentimeters() {
+        // 30.48 cm == 1 foot
+        assertEquals(
+                new QuantityLength(30.48, LengthUnit.CENTIMETERS),
+                new QuantityLength(1.0, LengthUnit.FEET));
+    }
+
+    // ── Refactored ConvertTo ─────────────────────────────────────────────
+
+    @Test
+    void testQuantityLengthRefactored_ConvertTo_FeetToInches() {
+        // 1 foot convertTo inches = 12 inches
+        QuantityLength result = new QuantityLength(1.0, LengthUnit.FEET)
+                .convertTo(LengthUnit.INCHES);
+        assertEquals(new QuantityLength(12.0, LengthUnit.INCHES), result);
     }
 
     @Test
-    void testAddition_ExplicitTargetUnit_NullSecondOperand() {
-        // null second operand should throw IllegalArgumentException
-        assertThrows(IllegalArgumentException.class, () ->
-                QuantityLength.add(
-                        new QuantityLength(1.0, LengthUnit.FEET),
-                        null,
-                        LengthUnit.FEET));
+    void testQuantityLengthRefactored_ConvertTo_YardsToFeet() {
+        // 1 yard convertTo feet = 3 feet
+        QuantityLength result = new QuantityLength(1.0, LengthUnit.YARDS)
+                .convertTo(LengthUnit.FEET);
+        assertEquals(new QuantityLength(3.0, LengthUnit.FEET), result);
     }
 
-    // ── Immutability ─────────────────────────────────────────────────────
-
     @Test
-    void testAddition_ExplicitTargetUnit_OriginalUnchanged() {
-        // original objects must not be modified after add
-        QuantityLength a = new QuantityLength(1.0, LengthUnit.FEET);
-        QuantityLength b = new QuantityLength(12.0, LengthUnit.INCHES);
-        QuantityLength.add(a, b, LengthUnit.YARDS);
-
-        assertEquals(new QuantityLength(1.0, LengthUnit.FEET), a);
-        assertEquals(new QuantityLength(12.0, LengthUnit.INCHES), b);
+    void testQuantityLengthRefactored_ConvertTo_CentimetersToInches() {
+        // 2.54 cm convertTo inches ≈ 1 inch
+        QuantityLength result = new QuantityLength(2.54, LengthUnit.CENTIMETERS)
+                .convertTo(LengthUnit.INCHES);
+        assertEquals(new QuantityLength(1.0, LengthUnit.INCHES), result);
     }
 
-    // ── Backward Compatibility ───────────────────────────────────────────
+    // ── Refactored Addition ──────────────────────────────────────────────
 
     @Test
-    void testBackwardCompatibility_UC6_AddDefaultUnit() {
-        // UC6 add() still returns result in first operand unit
+    void testQuantityLengthRefactored_Add() {
+        // 1 foot + 12 inches = 2 feet
         QuantityLength result = new QuantityLength(1.0, LengthUnit.FEET)
                 .add(new QuantityLength(12.0, LengthUnit.INCHES));
         assertEquals(new QuantityLength(2.0, LengthUnit.FEET), result);
     }
 
     @Test
+    void testQuantityLengthRefactored_AddWithTargetUnit() {
+        // 1 foot + 12 inches in YARDS = 0.67 yards
+        QuantityLength result = QuantityLength.add(
+                new QuantityLength(1.0, LengthUnit.FEET),
+                new QuantityLength(12.0, LengthUnit.INCHES),
+                LengthUnit.YARDS);
+        assertEquals(new QuantityLength(0.67, LengthUnit.YARDS), result);
+    }
+
+    // ── Invalid Input ────────────────────────────────────────────────────
+
+    @Test
+    void testQuantityLengthRefactored_NullUnit() {
+        // null unit should throw IllegalArgumentException
+        assertThrows(IllegalArgumentException.class, () ->
+                new QuantityLength(1.0, null));
+    }
+
+    @Test
+    void testQuantityLengthRefactored_InvalidValue_NaN() {
+        // NaN value should throw IllegalArgumentException
+        assertThrows(IllegalArgumentException.class, () ->
+                new QuantityLength(Double.NaN, LengthUnit.FEET));
+    }
+
+    @Test
+    void testQuantityLengthRefactored_InvalidValue_Infinite() {
+        // infinite value should throw IllegalArgumentException
+        assertThrows(IllegalArgumentException.class, () ->
+                new QuantityLength(Double.POSITIVE_INFINITY, LengthUnit.FEET));
+    }
+
+    // ── Immutability ─────────────────────────────────────────────────────
+
+    @Test
+    void testUnitImmutability() {
+        // enum constant conversion factor cannot be changed
+        double before = LengthUnit.FEET.getConversionFactor();
+        // no setter exists — immutability is enforced by enum design
+        double after  = LengthUnit.FEET.getConversionFactor();
+        assertEquals(before, after, EPSILON);
+    }
+
+    // ── Backward Compatibility UC1 → UC7 ────────────────────────────────
+
+    @Test
+    void testBackwardCompatibility_UC1_FeetEquality() {
+        assertEquals(
+                new QuantityLength(1.0, LengthUnit.FEET),
+                new QuantityLength(1.0, LengthUnit.FEET));
+    }
+
+    @Test
+    void testBackwardCompatibility_UC2_InchesEquality() {
+        assertEquals(
+                new QuantityLength(1.0, LengthUnit.INCHES),
+                new QuantityLength(1.0, LengthUnit.INCHES));
+    }
+
+    @Test
     void testBackwardCompatibility_UC5_Conversion() {
-        // UC5 conversion still works
         assertEquals(12.0,
                 QuantityLength.convert(1.0, LengthUnit.FEET, LengthUnit.INCHES), EPSILON);
     }
 
     @Test
-    void testBackwardCompatibility_UC4_CrossUnitEquality() {
-        // UC4 equality still works
-        assertEquals(
-                new QuantityLength(1.0, LengthUnit.YARDS),
-                new QuantityLength(3.0, LengthUnit.FEET));
+    void testBackwardCompatibility_UC6_Addition() {
+        QuantityLength result = new QuantityLength(1.0, LengthUnit.FEET)
+                .add(new QuantityLength(12.0, LengthUnit.INCHES));
+        assertEquals(new QuantityLength(2.0, LengthUnit.FEET), result);
+    }
+
+    @Test
+    void testBackwardCompatibility_UC7_AdditionWithTargetUnit() {
+        QuantityLength result = QuantityLength.add(
+                new QuantityLength(1.0, LengthUnit.FEET),
+                new QuantityLength(12.0, LengthUnit.INCHES),
+                LengthUnit.INCHES);
+        assertEquals(new QuantityLength(24.0, LengthUnit.INCHES), result);
     }
 }

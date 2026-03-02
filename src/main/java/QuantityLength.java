@@ -1,6 +1,7 @@
 /**
  * Represents a length measurement with a value and unit.
- * Supports equality, conversion, and addition with explicit target unit.
+ * Delegates all conversion logic to LengthUnit.
+ * Responsible only for equality comparison and arithmetic.
  */
 public class QuantityLength {
 
@@ -25,20 +26,19 @@ public class QuantityLength {
     // ── UC6: add with result in unit of first operand ────────────────────
 
     /**
-     * Adds another length to this length.
-     * Result is expressed in the unit of this (first) operand.
+     * Adds another length. Result is in this object's unit.
      * @param other second length to add
-     * @return new QuantityLength with sum in this object's unit
+     * @return new QuantityLength with sum in this unit
      */
     public QuantityLength add(QuantityLength other) {
         if (other == null) throw new IllegalArgumentException("Operand cannot be null");
-        return addInBaseUnit(this, other, this.unit);
+        return addAndConvert(this, other, this.unit);
     }
 
     // ── UC7: add with explicit target unit ──────────────────────────────
 
     /**
-     * Instance method - adds another length with explicit target unit.
+     * Adds another length with explicit target unit.
      * @param other      second length to add
      * @param targetUnit unit for the result
      * @return new QuantityLength with sum in target unit
@@ -46,11 +46,11 @@ public class QuantityLength {
     public QuantityLength add(QuantityLength other, LengthUnit targetUnit) {
         if (other == null)      throw new IllegalArgumentException("Operand cannot be null");
         if (targetUnit == null) throw new IllegalArgumentException("Target unit cannot be null");
-        return addInBaseUnit(this, other, targetUnit);
+        return addAndConvert(this, other, targetUnit);
     }
 
     /**
-     * Static method - adds two lengths with explicit target unit.
+     * Static add with explicit target unit.
      * @param first      first QuantityLength
      * @param second     second QuantityLength
      * @param targetUnit unit for the result
@@ -59,67 +59,80 @@ public class QuantityLength {
     public static QuantityLength add(QuantityLength first, QuantityLength second, LengthUnit targetUnit) {
         if (first == null || second == null) throw new IllegalArgumentException("Operands cannot be null");
         if (targetUnit == null)              throw new IllegalArgumentException("Target unit cannot be null");
-        return addInBaseUnit(first, second, targetUnit);
+        return addAndConvert(first, second, targetUnit);
     }
 
     /**
-     * Private helper - converts both to base unit, adds, converts to target.
-     * Used by all add() overloads to avoid code duplication.
-     * @param first      first QuantityLength
-     * @param second     second QuantityLength
-     * @param targetUnit unit for the result
-     * @return new QuantityLength with sum in target unit
+     * Private helper - delegates to unit methods for conversion.
+     * Converts both to base unit, adds, converts to target unit.
      */
-    private static QuantityLength addInBaseUnit(QuantityLength first, QuantityLength second, LengthUnit targetUnit) {
-        // convert both to base unit and sum
-        double sumInBase = first.toBaseUnit() + second.toBaseUnit();
+    private static QuantityLength addAndConvert(QuantityLength first,
+                                                QuantityLength second,
+                                                LengthUnit targetUnit) {
+        // delegate to unit for base unit conversion
+        double sumInBase   = first.unit.convertToBaseUnit(first.value)
+                + second.unit.convertToBaseUnit(second.value);
 
-        // convert sum to target unit and round to 2 decimal places
-        double resultValue = sumInBase / targetUnit.getConversionFactor();
-        resultValue = Math.round(resultValue * 100.0) / 100.0;
+        // delegate to unit for converting back to target unit
+        double resultValue = targetUnit.convertFromBaseUnit(sumInBase);
+        resultValue        = Math.round(resultValue * 100.0) / 100.0;
 
         return new QuantityLength(resultValue, targetUnit);
     }
 
     /**
+     * Converts this length to a target unit.
+     * Delegates conversion to LengthUnit methods.
+     * @param targetUnit unit to convert to
+     * @return new QuantityLength in target unit
+     */
+    public QuantityLength convertTo(LengthUnit targetUnit) {
+        if (targetUnit == null) throw new IllegalArgumentException("Target unit cannot be null");
+
+        // delegate to unit methods
+        double baseValue     = this.unit.convertToBaseUnit(this.value);
+        double convertedValue = targetUnit.convertFromBaseUnit(baseValue);
+        return new QuantityLength(convertedValue, targetUnit);
+    }
+
+    /**
      * Static conversion utility.
+     * Delegates to unit methods.
      */
     public static double convert(double value, LengthUnit sourceUnit, LengthUnit targetUnit) {
         if (sourceUnit == null || targetUnit == null)
             throw new IllegalArgumentException("Units cannot be null");
         if (!Double.isFinite(value))
             throw new IllegalArgumentException("Value must be finite");
-        return (value * sourceUnit.getConversionFactor()) / targetUnit.getConversionFactor();
+
+        // delegate to unit methods
+        double baseValue = sourceUnit.convertToBaseUnit(value);
+        return targetUnit.convertFromBaseUnit(baseValue);
     }
 
     /**
-     * Instance conversion method.
+     * Compares two lengths by delegating conversion to unit methods.
      */
-    public QuantityLength convertTo(LengthUnit targetUnit) {
-        if (targetUnit == null) throw new IllegalArgumentException("Target unit cannot be null");
-        double convertedValue = toBaseUnit() / targetUnit.getConversionFactor();
-        return new QuantityLength(convertedValue, targetUnit);
-    }
-
-    // convert this instance to base unit (feet)
-    private double toBaseUnit() {
-        return this.value * this.unit.getConversionFactor();
-    }
-
-    public LengthUnit getUnit()  { return unit; }
-    public double getValue()     { return value; }
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj)                      return true;
         if (obj == null)                      return false;
         if (!(obj instanceof QuantityLength)) return false;
+
         QuantityLength other = (QuantityLength) obj;
-        return Math.abs(this.toBaseUnit() - other.toBaseUnit()) < EPSILON;
+
+        // delegate to unit for base unit conversion
+        double thisBase  = this.unit.convertToBaseUnit(this.value);
+        double otherBase = other.unit.convertToBaseUnit(other.value);
+
+        return Math.abs(thisBase - otherBase) < EPSILON;
     }
 
     @Override
     public String toString() {
         return String.format("%.6f %s", value, unit.name());
     }
+
+    public LengthUnit getUnit()  { return unit; }
+    public double getValue()     { return value; }
 }
