@@ -76,6 +76,18 @@ public class QuantityMeasurementAppTest {
     }
 
     @Test
+    void testVolumeEquality() {
+
+        Quantity<VolumeUnit> litre =
+                new Quantity<>(1.0, VolumeUnit.LITRE);
+
+        Quantity<VolumeUnit> ml =
+                new Quantity<>(1000.0, VolumeUnit.MILLILITRE);
+
+        assertEquals(litre, ml);
+    }
+
+    @Test
     void testGramEqualsKilogram() {
 
         Quantity<WeightUnit> gram =
