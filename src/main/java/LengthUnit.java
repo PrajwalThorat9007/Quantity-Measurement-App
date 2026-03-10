@@ -42,4 +42,6 @@ public enum LengthUnit implements IMeasurable {
     public double convertFromBaseUnit(double baseValue) {
         return baseValue / this.conversionFactor;
     }
+
+    SupportsArithmetic supportsArithmetic = () -> true;
 }

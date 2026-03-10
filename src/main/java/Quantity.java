@@ -1,15 +1,16 @@
 /**
- * Generic quantity class supporting multiple measurement categories.
- * Works with any unit enum implementing IMeasurable.
+ * Generic Quantity class supporting multiple measurement categories.
+ * Works with any unit implementing IMeasurable.
  *
  * Supports:
- * Equality comparison
- * Unit conversion
- * Addition
- * Subtraction
- * Division (dimensionless)
+ *  - Equality comparison
+ *  - Conversion between units
+ *  - Addition
+ *  - Subtraction
+ *  - Division (dimensionless)
  *
- * UC13 refactors arithmetic logic into a centralized helper method.
+ * UC13: Refactored arithmetic via helper method
+ * UC14: Operation support validation (Temperature restrictions)
  */
 public class Quantity<U extends IMeasurable> {
 
@@ -19,7 +20,7 @@ public class Quantity<U extends IMeasurable> {
     private static final double EPSILON = 1e-6;
 
     /**
-     * Arithmetic operation types used by helper method.
+     * Arithmetic operations supported by Quantity.
      */
     private enum ArithmeticOperation {
         ADD,
@@ -28,7 +29,7 @@ public class Quantity<U extends IMeasurable> {
     }
 
     /**
-     * Constructor.
+     * Constructor
      */
     public Quantity(double value, U unit) {
 
@@ -51,7 +52,7 @@ public class Quantity<U extends IMeasurable> {
     }
 
     /**
-     * Centralized arithmetic helper method (UC13).
+     * Centralized arithmetic logic (UC13)
      */
     private double performOperation(
             Quantity<U> other,
@@ -59,6 +60,9 @@ public class Quantity<U extends IMeasurable> {
 
         if (other == null)
             throw new IllegalArgumentException("Operand cannot be null");
+
+        // UC14 operation validation
+        this.unit.validateOperationSupport(operation.name());
 
         if (this.unit.getClass() != other.unit.getClass())
             throw new IllegalArgumentException("Different measurement categories");
@@ -81,10 +85,9 @@ public class Quantity<U extends IMeasurable> {
                 if (base2 == 0)
                     throw new ArithmeticException("Division by zero");
                 return base1 / base2;
-
-            default:
-                throw new IllegalArgumentException("Unsupported operation");
         }
+
+        throw new IllegalArgumentException("Unsupported operation");
     }
 
     // ───────────────── ADDITION ─────────────────

@@ -7,4 +7,7 @@ public interface IMeasurable {
     double convertFromBaseUnit(double baseValue);
 
     String getUnitName();
+    default void validateOperationSupport(String operation) {
+        // default: all operations allowed
+    }
 }

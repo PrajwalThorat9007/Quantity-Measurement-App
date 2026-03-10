@@ -220,6 +220,31 @@ public class QuantityMeasurementApp {
 
         System.out.println("2 kg / 2000 g = "
                 + demonstrateDivision(w1, w2));
+
+        System.out.println("\n=== Temperature Operations ===");
+
+        Quantity<TemperatureUnit> t1 =
+                new Quantity<>(0.0, TemperatureUnit.CELSIUS);
+
+        Quantity<TemperatureUnit> t2 =
+                new Quantity<>(32.0, TemperatureUnit.FAHRENHEIT);
+
+        System.out.println("0C == 32F ? " + t1.equals(t2));
+
+        System.out.println("0C → F : "
+                + t1.convertTo(TemperatureUnit.FAHRENHEIT));
+
+        System.out.println("32F → C : "
+                + t2.convertTo(TemperatureUnit.CELSIUS));
+
+        try {
+
+            t1.add(t2);
+
+        } catch (UnsupportedOperationException e) {
+
+            System.out.println("Addition not supported for temperature");
+        }
     }
 
 }
