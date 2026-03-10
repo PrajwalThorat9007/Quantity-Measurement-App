@@ -36,6 +36,35 @@ public class QuantityMeasurementApp {
 
         return quantity1.add(quantity2, targetUnit);
     }
+    // ── Subtraction demonstration
+
+    public static <U extends IMeasurable> Quantity<U> demonstrateSubtraction(
+            Quantity<U> q1,
+            Quantity<U> q2) {
+
+        return q1.subtract(q2);
+    }
+
+
+// ── Subtraction with target unit
+
+    public static <U extends IMeasurable> Quantity<U> demonstrateSubtraction(
+            Quantity<U> q1,
+            Quantity<U> q2,
+            U targetUnit) {
+
+        return q1.subtract(q2, targetUnit);
+    }
+
+
+// ── Division demonstration
+
+    public static <U extends IMeasurable> double demonstrateDivision(
+            Quantity<U> q1,
+            Quantity<U> q2) {
+
+        return q1.divide(q2);
+    }
 
     // ── Main Method Demonstration ──────────────────────────────────
 
@@ -135,6 +164,62 @@ public class QuantityMeasurementApp {
 
         System.out.println("Volume vs Weight : "
                 + volume1.equals(new Quantity<>(1.0, WeightUnit.KILOGRAM)));
+
+        System.out.println("=== Length Subtraction ===");
+
+        Quantity<LengthUnit> length1 =
+                new Quantity<>(10.0, LengthUnit.FEET);
+
+        Quantity<LengthUnit> length2 =
+                new Quantity<>(6.0, LengthUnit.INCHES);
+
+        System.out.println("10 ft - 6 in = "
+                + demonstrateSubtraction(length1, length2));
+
+        System.out.println("10 ft - 6 in in inches = "
+                + demonstrateSubtraction(length1, length2, LengthUnit.INCHES));
+
+        System.out.println("\n=== Weight Subtraction ===");
+
+        Quantity<WeightUnit> weight1 =
+                new Quantity<>(5.0, WeightUnit.KILOGRAM);
+
+        Quantity<WeightUnit> weight2 =
+                new Quantity<>(2000.0, WeightUnit.GRAM);
+
+        System.out.println("5 kg - 2000 g = "
+                + demonstrateSubtraction(weight1, weight2));
+
+        System.out.println("\n=== Volume Subtraction ===");
+
+        Quantity<VolumeUnit> volume4 =
+                new Quantity<>(5.0, VolumeUnit.LITRE);
+
+        Quantity<VolumeUnit> volume5 =
+                new Quantity<>(2.0, VolumeUnit.LITRE);
+
+        System.out.println("5 L - 2 L = "
+                + demonstrateSubtraction(volume1, volume2));
+
+        System.out.println("\n=== Division Operations ===");
+
+        Quantity<LengthUnit> l1 =
+                new Quantity<>(10.0, LengthUnit.FEET);
+
+        Quantity<LengthUnit> l2 =
+                new Quantity<>(2.0, LengthUnit.FEET);
+
+        System.out.println("10 ft / 2 ft = "
+                + demonstrateDivision(l1, l2));
+
+        Quantity<WeightUnit> w1 =
+                new Quantity<>(2.0, WeightUnit.KILOGRAM);
+
+        Quantity<WeightUnit> w2 =
+                new Quantity<>(2000.0, WeightUnit.GRAM);
+
+        System.out.println("2 kg / 2000 g = "
+                + demonstrateDivision(w1, w2));
     }
 
 }
