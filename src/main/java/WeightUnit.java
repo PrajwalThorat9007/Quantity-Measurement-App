@@ -3,7 +3,7 @@
  * Responsible for all weight unit conversion logic.
  * Base unit is KILOGRAM (conversionFactor = 1.0).
  */
-public enum WeightUnit {
+public enum WeightUnit implements IMeasurable {
 
     KILOGRAM(1.0),
     GRAM(0.001),          // 1 gram = 0.001 kilogram
@@ -13,6 +13,11 @@ public enum WeightUnit {
 
     WeightUnit(double conversionFactor) {
         this.conversionFactor = conversionFactor;
+    }
+
+    @Override
+    public String getUnitName() {
+        return this.name();
     }
 
     public double getConversionFactor() {

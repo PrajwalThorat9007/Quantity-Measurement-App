@@ -3,7 +3,7 @@
  * Responsible for all unit conversion logic.
  * Base unit is FEET (conversionFactor = 1.0).
  */
-public enum LengthUnit {
+public enum LengthUnit implements IMeasurable {
 
     FEET(1.0),
     INCHES(1.0 / 12.0),
@@ -27,6 +27,11 @@ public enum LengthUnit {
      */
     public double convertToBaseUnit(double value) {
         return value * this.conversionFactor;
+    }
+
+    @Override
+    public String getUnitName() {
+        return this.name();
     }
 
     /**

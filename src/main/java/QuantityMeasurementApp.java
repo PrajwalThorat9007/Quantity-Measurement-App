@@ -1,109 +1,88 @@
 public class QuantityMeasurementApp {
 
-    // ── Weight Demo Methods ──────────────────────────────────────────────
+    // ── Generic Equality Demonstration ─────────────────────────────
 
-    /**
-     * Demonstrates weight equality.
-     */
-    public static void demonstrateWeightEquality(QuantityWeight a, QuantityWeight b) {
-        System.out.printf("equals(%s, %s) = %b%n", a, b, a.equals(b));
+    public static <U extends IMeasurable> boolean demonstrateEquality(
+            Quantity<U> quantity1,
+            Quantity<U> quantity2) {
+
+        return quantity1.equals(quantity2);
     }
 
-    /**
-     * Demonstrates weight conversion using instance method.
-     */
-    public static void demonstrateWeightConversion(QuantityWeight weight, WeightUnit toUnit) {
-        QuantityWeight result = weight.convertTo(toUnit);
-        System.out.printf("convert(%s → %s) = %s%n", weight, toUnit, result);
+    // ── Generic Conversion Demonstration ───────────────────────────
+
+    public static <U extends IMeasurable> Quantity<U> demonstrateConversion(
+            Quantity<U> quantity,
+            U targetUnit) {
+
+        return quantity.convertTo(targetUnit);
     }
 
-    /**
-     * Demonstrates weight addition with result in first operand unit.
-     */
-    public static void demonstrateWeightAddition(QuantityWeight first, QuantityWeight second) {
-        QuantityWeight result = first.add(second);
-        System.out.printf("add(%s, %s) = %s%n", first, second, result);
+    // ── Generic Addition (result in first operand unit) ────────────
+
+    public static <U extends IMeasurable> Quantity<U> demonstrateAddition(
+            Quantity<U> quantity1,
+            Quantity<U> quantity2) {
+
+        return quantity1.add(quantity2);
     }
 
-    /**
-     * Demonstrates weight addition with explicit target unit.
-     */
-    public static void demonstrateWeightAddition(QuantityWeight first,
-                                                 QuantityWeight second,
-                                                 WeightUnit targetUnit) {
-        QuantityWeight result = QuantityWeight.add(first, second, targetUnit);
-        System.out.printf("add(%s, %s, %s) = %s%n", first, second, targetUnit, result);
+    // ── Generic Addition (explicit target unit) ────────────────────
+
+    public static <U extends IMeasurable> Quantity<U> demonstrateAddition(
+            Quantity<U> quantity1,
+            Quantity<U> quantity2,
+            U targetUnit) {
+
+        return quantity1.add(quantity2, targetUnit);
     }
 
-    // ── Length Demo Methods (unchanged from UC8) ─────────────────────────
-
-    public static void demonstrateLengthConversion(double value, LengthUnit from, LengthUnit to) {
-        System.out.printf("convert(%.4f %s → %s) = %.6f%n",
-                value, from, to, QuantityLength.convert(value, from, to));
-    }
-
-    public static void demonstrateLengthConversion(QuantityLength length, LengthUnit toUnit) {
-        System.out.printf("convert(%s → %s) = %s%n", length, toUnit, length.convertTo(toUnit));
-    }
-
-    public static void demonstrateLengthAddition(QuantityLength first, QuantityLength second) {
-        System.out.printf("add(%s, %s) = %s%n", first, second, first.add(second));
-    }
-
-    public static void demonstrateLengthAddition(QuantityLength first,
-                                                 QuantityLength second,
-                                                 LengthUnit targetUnit) {
-        System.out.printf("add(%s, %s, %s) = %s%n",
-                first, second, targetUnit, QuantityLength.add(first, second, targetUnit));
-    }
+    // ── Main Method Demonstration ──────────────────────────────────
 
     public static void main(String[] args) {
 
-        System.out.println("=== UC9: Weight Equality ===\n");
+        System.out.println("=== Length Operations ===");
 
-        demonstrateWeightEquality(
-                new QuantityWeight(1.0, WeightUnit.KILOGRAM),
-                new QuantityWeight(1.0, WeightUnit.KILOGRAM));
+        Quantity<LengthUnit> lengthFeet =
+                new Quantity<>(1.0, LengthUnit.FEET);
 
-        demonstrateWeightEquality(
-                new QuantityWeight(1.0, WeightUnit.KILOGRAM),
-                new QuantityWeight(1000.0, WeightUnit.GRAM));
+        Quantity<LengthUnit> lengthInches =
+                new Quantity<>(12.0, LengthUnit.INCHES);
 
-        demonstrateWeightEquality(
-                new QuantityWeight(1.0, WeightUnit.KILOGRAM),
-                new QuantityWeight(2.20462, WeightUnit.POUND));
+        System.out.println("Length Equality: " +
+                demonstrateEquality(lengthFeet, lengthInches));
 
-        System.out.println("\n=== UC9: Weight Conversion ===\n");
+        System.out.println("Length Conversion (Feet → Inches): " +
+                demonstrateConversion(lengthFeet, LengthUnit.INCHES));
 
-        demonstrateWeightConversion(
-                new QuantityWeight(1.0, WeightUnit.KILOGRAM), WeightUnit.GRAM);
+        System.out.println("Length Addition: " +
+                demonstrateAddition(lengthFeet, lengthInches));
 
-        demonstrateWeightConversion(
-                new QuantityWeight(2.0, WeightUnit.POUND), WeightUnit.KILOGRAM);
 
-        demonstrateWeightConversion(
-                new QuantityWeight(500.0, WeightUnit.GRAM), WeightUnit.POUND);
+        System.out.println("\n=== Weight Operations ===");
 
-        System.out.println("\n=== UC9: Weight Addition ===\n");
+        Quantity<WeightUnit> weightKg =
+                new Quantity<>(1.0, WeightUnit.KILOGRAM);
 
-        // implicit target unit
-        demonstrateWeightAddition(
-                new QuantityWeight(1.0, WeightUnit.KILOGRAM),
-                new QuantityWeight(2.0, WeightUnit.KILOGRAM));
+        Quantity<WeightUnit> weightGram =
+                new Quantity<>(1000.0, WeightUnit.GRAM);
 
-        demonstrateWeightAddition(
-                new QuantityWeight(1.0, WeightUnit.KILOGRAM),
-                new QuantityWeight(1000.0, WeightUnit.GRAM));
+        System.out.println("Weight Equality: " +
+                demonstrateEquality(weightKg, weightGram));
 
-        // explicit target unit
-        demonstrateWeightAddition(
-                new QuantityWeight(1.0, WeightUnit.KILOGRAM),
-                new QuantityWeight(1000.0, WeightUnit.GRAM),
-                WeightUnit.GRAM);
+        System.out.println("Weight Conversion (Kg → Gram): " +
+                demonstrateConversion(weightKg, WeightUnit.GRAM));
 
-        demonstrateWeightAddition(
-                new QuantityWeight(2.0, WeightUnit.KILOGRAM),
-                new QuantityWeight(4.0, WeightUnit.POUND),
-                WeightUnit.KILOGRAM);
+        System.out.println("Weight Addition: " +
+                demonstrateAddition(weightKg, weightGram));
+
+
+        System.out.println("\n=== Explicit Target Unit Addition ===");
+
+        Quantity<WeightUnit> weightPound =
+                new Quantity<>(2.0, WeightUnit.POUND);
+
+        System.out.println("Addition in KG: " +
+                demonstrateAddition(weightKg, weightPound, WeightUnit.KILOGRAM));
     }
 }
