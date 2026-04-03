@@ -1,3 +1,5 @@
+package core;
+
 /**
  * Standalone enum representing weight units.
  * Responsible for all weight unit conversion logic.

@@ -1,6 +1,8 @@
+package core;
+
 /**
- * Generic Quantity class supporting multiple measurement categories.
- * Works with any unit implementing IMeasurable.
+ * Generic core.Quantity class supporting multiple measurement categories.
+ * Works with any unit implementing core.IMeasurable.
  *
  * Supports:
  *  - Equality comparison
@@ -20,7 +22,7 @@ public class Quantity<U extends IMeasurable> {
     private static final double EPSILON = 1e-6;
 
     /**
-     * Arithmetic operations supported by Quantity.
+     * Arithmetic operations supported by core.Quantity.
      */
     private enum ArithmeticOperation {
         ADD,

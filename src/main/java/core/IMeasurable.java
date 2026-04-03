@@ -1,3 +1,5 @@
+package core;
+
 public interface IMeasurable {
 
     double getConversionFactor();

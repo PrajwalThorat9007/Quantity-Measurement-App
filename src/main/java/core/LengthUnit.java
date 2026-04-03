@@ -1,3 +1,5 @@
+package core;
+
 /**
  * Standalone enum representing length units.
  * Responsible for all unit conversion logic.
