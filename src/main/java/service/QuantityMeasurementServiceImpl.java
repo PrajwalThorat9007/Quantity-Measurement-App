@@ -2,9 +2,16 @@ package service;
 
 import core.IMeasurable;
 import core.Quantity;
+import repository.IQuantityMeasurementRepository;
 
 public class QuantityMeasurementServiceImpl<U extends IMeasurable>
         implements QuantityMeasurementService<U> {
+
+    private final IQuantityMeasurementRepository repository;
+
+    public QuantityMeasurementServiceImpl(IQuantityMeasurementRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public boolean compare(Quantity<U> q1, Quantity<U> q2) {

@@ -1,18 +1,25 @@
 package app;
+
 import controller.QuantityMeasurementController;
 import core.LengthUnit;
 import core.Quantity;
 import core.WeightUnit;
+import repository.IQuantityMeasurementRepository;
+import repository.QuantityMeasurementDatabaseRepository;
 import service.QuantityMeasurementService;
 import service.QuantityMeasurementServiceImpl;
-
 
 public class QuantityMeasurementApp {
 
     public static void main(String[] args) {
 
+        // ✅ Create ONE repository
+        IQuantityMeasurementRepository repository =
+                new QuantityMeasurementDatabaseRepository();
+
+        // ✅ Inject repository into services
         QuantityMeasurementService<LengthUnit> lengthService =
-                new QuantityMeasurementServiceImpl<>();
+                new QuantityMeasurementServiceImpl<>(repository);
 
         QuantityMeasurementController<LengthUnit> lengthController =
                 new QuantityMeasurementController<>(lengthService);
@@ -32,8 +39,9 @@ public class QuantityMeasurementApp {
         lengthController.divide(l1, l2);
 
 
+        // ✅ Same repository used for weight
         QuantityMeasurementService<WeightUnit> weightService =
-                new QuantityMeasurementServiceImpl<>();
+                new QuantityMeasurementServiceImpl<>(repository);
 
         QuantityMeasurementController<WeightUnit> weightController =
                 new QuantityMeasurementController<>(weightService);
@@ -51,5 +59,10 @@ public class QuantityMeasurementApp {
         weightController.add(w1, w2);
         weightController.subtract(w1, w2);
         weightController.divide(w1, w2);
+
+
+        // ✅ Print stored DB data
+        System.out.println("\n=== DATABASE DATA ===");
+        repository.getAllMeasurements().forEach(System.out::println);
     }
 }
