@@ -2,7 +2,7 @@ package core;
 
 import java.util.function.Function;
 
-public enum TemperatureUnit implements IMeasurable {
+public enum     TemperatureUnit implements IMeasurable {
 
     CELSIUS(
             c -> c,
